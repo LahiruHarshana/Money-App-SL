@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFinanceStore } from "@/store/finance-store";
 import { ICON_MAP, ICON_GROUPS, COLOR_SWATCHES, type Category } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -8,7 +8,8 @@ import {
   DndContext,
   closestCenter,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   type DragEndEvent,
@@ -29,10 +30,11 @@ import {
   Wallet,
   Plus,
   X,
-  Trash2,
   Check,
   ArrowLeft,
-  GripVertical,
+  GripHorizontal,
+  Minus,
+  Pencil,
 } from "lucide-react";
 
 type ProfileView = "main" | "categories" | "add-category";
@@ -44,7 +46,8 @@ export default function ProfilePage() {
   if (view === "categories") {
     return (
       <CategoryManagement
-        type={editingType}
+        initialType={editingType}
+        onTypeChange={setEditingType}
         onBack={() => setView("main")}
         onAddNew={() => setView("add-category")}
       />
@@ -166,26 +169,46 @@ export default function ProfilePage() {
 
 // ── Category Management Screen ─────────────────────────────
 function CategoryManagement({
-  type,
+  initialType,
+  onTypeChange,
   onBack,
   onAddNew,
 }: {
-  type: "expense" | "income";
+  initialType: "expense" | "income";
+  onTypeChange: (type: "expense" | "income") => void;
   onBack: () => void;
   onAddNew: () => void;
 }) {
+  const [activeType, setActiveType] = useState<"expense" | "income">(
+    initialType
+  );
+
   const expenseCategories = useFinanceStore((s) => s.expenseCategories);
   const incomeCategories = useFinanceStore((s) => s.incomeCategories);
   const deleteCategory = useFinanceStore((s) => s.deleteCategory);
   const reorderCategories = useFinanceStore((s) => s.reorderCategories);
 
+  useEffect(() => {
+    setActiveType(initialType);
+  }, [initialType]);
+
   const categories =
-    type === "expense"
+    activeType === "expense"
       ? [...expenseCategories].sort((a, b) => a.order - b.order)
       : [...incomeCategories].sort((a, b) => a.order - b.order);
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
+      },
+    }),
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 6,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
@@ -200,11 +223,11 @@ function CategoryManagement({
     if (oldIndex < 0 || newIndex < 0) return;
 
     const reordered = arrayMove(categories, oldIndex, newIndex);
-    reorderCategories(type, reordered);
+    reorderCategories(activeType, reordered);
   };
 
   return (
-    <div className="pt-safe md:pt-0 animate-scale-in">
+    <div className="w-full overflow-x-hidden pt-safe md:pt-0 animate-scale-in">
       <header className="flex items-center gap-3 px-4 pt-4 pb-3 md:px-8 md:pt-8 md:pb-4">
         <button
           onClick={onBack}
@@ -214,41 +237,81 @@ function CategoryManagement({
         </button>
         <div className="flex-1">
           <h1 className="text-lg font-bold text-navy-900 tracking-tight">
-            {type === "expense" ? "Expense" : "Income"} Categories
+            Category Settings
           </h1>
           <p className="text-xs text-navy-400 font-medium">
+            Manage category order and visibility
+          </p>
+        </div>
+      </header>
+
+      <div className="w-full px-4 md:px-8">
+        <div className="mx-auto w-full max-w-3xl">
+          <div className="p-1 rounded-2xl bg-navy-100 flex w-full overflow-hidden">
+            {(["expense", "income"] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => {
+                  setActiveType(tab);
+                  onTypeChange(tab);
+                }}
+                className={cn(
+                  "flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all",
+                  activeType === tab
+                    ? tab === "expense"
+                      ? "bg-rose-500 text-white shadow-sm"
+                      : "bg-emerald-500 text-white shadow-sm"
+                    : "text-navy-500 hover:text-navy-700"
+                )}
+              >
+                {tab === "expense" ? "Expense" : "Income"}
+              </button>
+            ))}
+          </div>
+
+          <p className="mt-3 text-xs font-medium text-navy-400 px-1">
             {categories.length} categories
           </p>
         </div>
-        <button
-          onClick={onAddNew}
-          className="p-2 rounded-xl bg-emerald-500 text-white hover:bg-emerald-600 transition-colors"
-        >
-          <Plus className="w-5 h-5" />
-        </button>
-      </header>
+      </div>
 
-      <div className="px-4 mt-3 md:px-8">
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={categories.map((cat) => cat.id)}
-            strategy={verticalListSortingStrategy}
+      <div className="w-full px-4 md:px-8 pt-3 pb-24 overflow-x-hidden">
+        <div className="mx-auto w-full max-w-3xl">
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
           >
-            <div className="space-y-2">
-              {categories.map((cat) => (
-                <SortableCategoryItem
-                  key={cat.id}
-                  category={cat}
-                  onDelete={deleteCategory}
-                />
-              ))}
-            </div>
-          </SortableContext>
-        </DndContext>
+            <SortableContext
+              items={categories.map((cat) => cat.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="space-y-2 w-full overflow-x-hidden touch-pan-y">
+                {categories.map((cat) => (
+                  <SortableCategoryItem
+                    key={cat.id}
+                    category={cat}
+                    onDelete={deleteCategory}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        </div>
+      </div>
+
+      <div className="sticky bottom-0 z-20 w-full border-t border-navy-100 bg-white/90 backdrop-blur-sm">
+        <div className="w-full px-4 md:px-8 py-3">
+          <div className="mx-auto w-full max-w-3xl">
+            <button
+              onClick={onAddNew}
+              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all active:scale-[0.99]"
+            >
+              <Plus className="w-5 h-5" />
+              <span>Add Category</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -282,38 +345,51 @@ function SortableCategoryItem({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "flex items-center gap-3 bg-white rounded-2xl p-3 shadow-sm border border-navy-50 group",
-        isDragging && "opacity-70"
+        "w-full max-w-full flex items-center gap-2.5 bg-white rounded-2xl p-3 shadow-sm border border-navy-100",
+        isDragging && "opacity-80 shadow-lg"
       )}
     >
       <button
-        {...attributes}
-        {...listeners}
-        className="p-1.5 rounded-lg text-navy-300 hover:bg-navy-50 hover:text-navy-500 transition-colors cursor-grab active:cursor-grabbing"
-        aria-label={`Reorder ${category.name}`}
+        onClick={() => onDelete(category.id)}
+        className="w-6 h-6 rounded-full bg-rose-500 hover:bg-rose-600 text-white flex items-center justify-center shrink-0 transition-colors"
+        aria-label={`Delete ${category.name}`}
       >
-        <GripVertical className="w-4 h-4" />
+        <Minus className="w-3.5 h-3.5" strokeWidth={3} />
       </button>
 
-      <div
-        className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-        style={{ backgroundColor: `${category.color}15` }}
-      >
-        {Icon && <Icon className="w-5 h-5" style={{ color: category.color }} />}
-      </div>
+      <div className="flex-1 min-w-0 flex items-center gap-3 overflow-hidden">
+        <div
+          className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+          style={{ backgroundColor: `${category.color}20` }}
+        >
+          {Icon && (
+            <Icon className="w-5 h-5" style={{ color: category.color }} />
+          )}
+        </div>
 
-      <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-navy-800 truncate">
           {category.name}
         </p>
       </div>
 
-      <button
-        onClick={() => onDelete(category.id)}
-        className="p-2 rounded-lg text-navy-300 hover:text-rose-500 hover:bg-rose-50 transition-all opacity-0 group-hover:opacity-100"
-      >
-        <Trash2 className="w-4 h-4" />
-      </button>
+      <div className="flex items-center gap-1 shrink-0">
+        <button
+          className="p-2 rounded-lg text-navy-300 hover:text-navy-500 hover:bg-navy-50 transition-colors"
+          aria-label={`Edit ${category.name}`}
+        >
+          <Pencil className="w-4 h-4" />
+        </button>
+
+        <button
+          {...attributes}
+          {...listeners}
+          className="p-2 rounded-lg text-navy-300 hover:text-navy-600 hover:bg-navy-50 transition-colors cursor-grab active:cursor-grabbing touch-none"
+          aria-label={`Reorder ${category.name}`}
+          style={{ touchAction: "none" }}
+        >
+          <GripHorizontal className="w-5 h-5" />
+        </button>
+      </div>
     </div>
   );
 }

@@ -29,7 +29,6 @@ import {
   Tag,
   Wallet,
   Plus,
-  X,
   Check,
   ArrowLeft,
   GripHorizontal,

@@ -42,6 +42,7 @@ export default function AddCategoryModal({
   useEffect(() => {
     if (open) {
       if (initialCategory) {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
         setActiveTab(initialCategory.type);
         setName(initialCategory.name);
         setSelectedIcon(initialCategory.icon);

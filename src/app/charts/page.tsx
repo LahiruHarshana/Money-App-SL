@@ -97,123 +97,123 @@ export default function ChartsPage() {
             {/* Breakdowns column */}
             <div className="md:col-span-3 space-y-6">
 
-          {/* Expense Breakdown */}
-          {expenseEntries.length > 0 && (
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <TrendingDown className="w-4 h-4 text-rose-500" />
-                <h3 className="text-sm font-bold text-navy-800 uppercase tracking-wider">
-                  Expenses Breakdown
-                </h3>
-              </div>
-              <div className="space-y-2">
-                {expenseEntries.map((entry) => {
-                  const Icon = ICON_MAP[entry.icon];
-                  const pct = totalExpenses > 0 ? (entry.amount / totalExpenses) * 100 : 0;
-                  return (
-                    <div
-                      key={entry.name}
-                      className="bg-white rounded-2xl p-3 shadow-sm border border-navy-50"
-                    >
-                      <div className="flex items-center gap-3">
+              {/* Expense Breakdown */}
+              {expenseEntries.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <TrendingDown className="w-4 h-4 text-rose-500" />
+                    <h3 className="text-sm font-bold text-navy-800 uppercase tracking-wider">
+                      Expenses Breakdown
+                    </h3>
+                  </div>
+                  <div className="space-y-2">
+                    {expenseEntries.map((entry) => {
+                      const Icon = ICON_MAP[entry.icon];
+                      const pct = totalExpenses > 0 ? (entry.amount / totalExpenses) * 100 : 0;
+                      return (
                         <div
-                          className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                          style={{ backgroundColor: `${entry.color}15` }}
+                          key={entry.name}
+                          className="bg-white rounded-2xl p-3 shadow-sm border border-navy-50"
                         >
-                          {Icon && (
-                            <Icon className="w-5 h-5" style={{ color: entry.color }} />
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-1">
-                            <p className="text-sm font-semibold text-navy-800 truncate">
-                              {entry.name}
-                            </p>
-                            <p className="text-sm font-bold text-navy-800 shrink-0 ml-2">
-                              {formatCurrency(entry.amount)}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className="flex-1 h-2 bg-navy-50 rounded-full overflow-hidden">
-                              <div
-                                className="h-full rounded-full transition-all duration-500"
-                                style={{
-                                  width: `${pct}%`,
-                                  backgroundColor: entry.color,
-                                }}
-                              />
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                              style={{ backgroundColor: `${entry.color}15` }}
+                            >
+                              {Icon && (
+                                <Icon className="w-5 h-5" style={{ color: entry.color }} />
+                              )}
                             </div>
-                            <span className="text-[11px] font-semibold text-navy-400 shrink-0 w-10 text-right">
-                              {pct.toFixed(1)}%
-                            </span>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between mb-1">
+                                <p className="text-sm font-semibold text-navy-800 truncate">
+                                  {entry.name}
+                                </p>
+                                <p className="text-sm font-bold text-navy-800 shrink-0 ml-2">
+                                  {formatCurrency(entry.amount)}
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="flex-1 h-2 bg-navy-50 rounded-full overflow-hidden">
+                                  <div
+                                    className="h-full rounded-full transition-all duration-500"
+                                    style={{
+                                      width: `${pct}%`,
+                                      backgroundColor: entry.color,
+                                    }}
+                                  />
+                                </div>
+                                <span className="text-[11px] font-semibold text-navy-400 shrink-0 w-10 text-right">
+                                  {pct.toFixed(1)}%
+                                </span>
+                              </div>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
-          {/* Income Breakdown */}
-          {incomeEntries.length > 0 && (
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <TrendingUp className="w-4 h-4 text-emerald-500" />
-                <h3 className="text-sm font-bold text-navy-800 uppercase tracking-wider">
-                  Income Breakdown
-                </h3>
-              </div>
-              <div className="space-y-2">
-                {incomeEntries.map((entry) => {
-                  const Icon = ICON_MAP[entry.icon];
-                  const pct = totalIncome > 0 ? (entry.amount / totalIncome) * 100 : 0;
-                  return (
-                    <div
-                      key={entry.name}
-                      className="bg-white rounded-2xl p-3 shadow-sm border border-navy-50"
-                    >
-                      <div className="flex items-center gap-3">
+              {/* Income Breakdown */}
+              {incomeEntries.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <TrendingUp className="w-4 h-4 text-emerald-500" />
+                    <h3 className="text-sm font-bold text-navy-800 uppercase tracking-wider">
+                      Income Breakdown
+                    </h3>
+                  </div>
+                  <div className="space-y-2">
+                    {incomeEntries.map((entry) => {
+                      const Icon = ICON_MAP[entry.icon];
+                      const pct = totalIncome > 0 ? (entry.amount / totalIncome) * 100 : 0;
+                      return (
                         <div
-                          className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                          style={{ backgroundColor: `${entry.color}15` }}
+                          key={entry.name}
+                          className="bg-white rounded-2xl p-3 shadow-sm border border-navy-50"
                         >
-                          {Icon && (
-                            <Icon className="w-5 h-5" style={{ color: entry.color }} />
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-1">
-                            <p className="text-sm font-semibold text-navy-800 truncate">
-                              {entry.name}
-                            </p>
-                            <p className="text-sm font-bold text-emerald-600 shrink-0 ml-2">
-                              {formatCurrency(entry.amount)}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className="flex-1 h-2 bg-navy-50 rounded-full overflow-hidden">
-                              <div
-                                className="h-full rounded-full transition-all duration-500"
-                                style={{
-                                  width: `${pct}%`,
-                                  backgroundColor: entry.color,
-                                }}
-                              />
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                              style={{ backgroundColor: `${entry.color}15` }}
+                            >
+                              {Icon && (
+                                <Icon className="w-5 h-5" style={{ color: entry.color }} />
+                              )}
                             </div>
-                            <span className="text-[11px] font-semibold text-navy-400 shrink-0 w-10 text-right">
-                              {pct.toFixed(1)}%
-                            </span>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between mb-1">
+                                <p className="text-sm font-semibold text-navy-800 truncate">
+                                  {entry.name}
+                                </p>
+                                <p className="text-sm font-bold text-emerald-600 shrink-0 ml-2">
+                                  {formatCurrency(entry.amount)}
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="flex-1 h-2 bg-navy-50 rounded-full overflow-hidden">
+                                  <div
+                                    className="h-full rounded-full transition-all duration-500"
+                                    style={{
+                                      width: `${pct}%`,
+                                      backgroundColor: entry.color,
+                                    }}
+                                  />
+                                </div>
+                                <span className="text-[11px] font-semibold text-navy-400 shrink-0 w-10 text-right">
+                                  {pct.toFixed(1)}%
+                                </span>
+                              </div>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>{/* end breakdowns column */}
           </div>{/* end desktop grid */}
         </div>
@@ -242,13 +242,13 @@ function DonutChart({
   }
 
   // Build conic gradient
-  let accumulated = 0;
-  const stops = entries.map((entry) => {
-    const start = accumulated;
+  const { stops } = entries.reduce((acc, entry) => {
     const pct = (entry.amount / total) * 100;
-    accumulated += pct;
-    return `${entry.color} ${start}% ${accumulated}%`;
-  });
+    const end = acc.accumulated + pct;
+    acc.stops.push(`${entry.color} ${acc.accumulated}% ${end}%`);
+    acc.accumulated = end;
+    return acc;
+  }, { accumulated: 0, stops: [] as string[] });
 
   const gradient = `conic-gradient(${stops.join(", ")})`;
 

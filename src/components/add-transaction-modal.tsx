@@ -53,6 +53,7 @@ export default function AddTransactionModal({
   // Reset when modal opens
   useEffect(() => {
     if (open) {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
       setAmount("");
       setNote("");
       setSelectedCategory("");
@@ -65,6 +66,7 @@ export default function AddTransactionModal({
 
   // Set default category when tab changes
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     setSelectedCategory("");
   }, [activeTab]);
 

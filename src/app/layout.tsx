@@ -15,14 +15,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MoneySL - Personal Finance Tracker",
-  description:
-    "Track your expenses and income in Sri Lankan Rupees. A modern personal finance app built for Sri Lanka.",
+  title: "SalliPotha - Personal Finance Tracker",
+  description: "Track your expenses and income in Sri Lankan Rupees. A modern personal finance app built for Sri Lanka.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "MoneySL",
+    title: "SalliPotha",
   },
 };
 
@@ -31,7 +30,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#0f1d4e",
+  themeColor: "#047857", // emerald-700
   viewportFit: "cover",
 };
 
@@ -41,18 +40,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="overflow-x-hidden">
+    <html lang="en" className="overflow-x-hidden bg-gray-50">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased w-full max-w-full overflow-x-hidden`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased w-full max-w-[100vw] overflow-x-hidden min-h-screen flex text-slate-900 bg-gray-50`}
       >
         <Sidebar />
-        {/* Mobile: centered max-w-lg with bottom-nav padding */}
-        {/* Desktop: offset by sidebar, remaining width fills viewport */}
-        <main className="w-full max-w-lg mx-auto min-h-screen pb-24 overflow-x-hidden md:max-w-none md:mx-0 md:ml-64 md:w-[calc(100%-16rem)] md:pb-6">
-          <div className="md:max-w-6xl md:mx-auto md:px-2">
+        {/* Main Content Area */}
+        {/* Mobile: takes full width, pb-20 for bottom nav. Desktop: remains full width but md:pl-64 gives room for sidebar. */}
+        <div className="flex-1 flex flex-col min-w-0 min-h-screen overflow-x-hidden pb-20 md:pb-0 md:pl-64">
+          <main className="flex-1 w-full max-w-7xl mx-auto p-4 md:p-8 overflow-x-hidden">
             {children}
-          </div>
-        </main>
+          </main>
+        </div>
         <BottomNav />
       </body>
     </html>

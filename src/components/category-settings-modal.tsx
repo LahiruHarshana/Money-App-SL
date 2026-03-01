@@ -160,89 +160,97 @@ export default function CategorySettingsModal({
     if (!open) return null;
 
     return (
-        <div className="fixed inset-0 z-[140] flex flex-col bg-white animate-fade-in">
-            {/* Header */}
-            <div className="flex items-center justify-between px-5 pt-safe-top pb-3 mt-4">
-                <button
-                    onClick={onClose}
-                    className="p-2 -ml-2 rounded-xl hover:bg-navy-50 text-navy-800 transition-colors"
-                >
-                    <ArrowLeft className="w-6 h-6" />
-                </button>
-                <h2 className="text-lg font-medium text-navy-800">Category settings</h2>
-                <button className="p-2 -mr-2 rounded-xl hover:bg-navy-50 text-navy-800 transition-colors">
-                    <Settings2 className="w-6 h-6" />
-                </button>
-            </div>
-
-            {/* Tabs */}
-            <div className="px-5 mb-4">
-                <div className="flex bg-navy-50/80 rounded-xl p-1">
-                    {(["expense", "income"] as const).map((tab) => (
-                        <button
-                            key={tab}
-                            onClick={() => setActiveTab(tab)}
-                            className={cn(
-                                "flex-1 py-2.5 text-sm font-medium rounded-lg transition-all capitalize",
-                                activeTab === tab
-                                    ? "bg-navy-900 text-amber-400 shadow-sm"
-                                    : "text-navy-600 hover:text-navy-900"
-                            )}
-                        >
-                            {tab}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            {/* Category List */}
-            <div className="flex-1 overflow-y-auto pb-32">
-                <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={handleDragEnd}
-                >
-                    <div className="divide-y divide-navy-50">
-                        <SortableContext
-                            items={categories.map((c) => c.id)}
-                            strategy={verticalListSortingStrategy}
-                        >
-                            {categories.map((cat) => (
-                                <SortableCategoryItem
-                                    key={cat.id}
-                                    cat={cat}
-                                    onDelete={handleDelete}
-                                    onEdit={handleEdit}
-                                />
-                            ))}
-                        </SortableContext>
-                    </div>
-                </DndContext>
-            </div>
-
-            {/* Sticky Bottom Button */}
-            <div className="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-white via-white to-transparent pt-10 pb-safe-bottom pointer-events-none">
-                <button
-                    onClick={() => {
-                        setEditingCategory(null);
-                        setShowAddCategory(true);
-                    }}
-                    className="w-full py-4 rounded-xl bg-amber-400 hover:bg-amber-500 text-navy-900 font-medium text-base shadow-lg shadow-amber-400/20 transition-all flex items-center justify-center gap-2 active:scale-[0.98] pointer-events-auto"
-                >
-                    <Plus className="w-5 h-5" />
-                    Add category
-                </button>
-            </div>
-
-            <AddCategoryModal
-                open={showAddCategory}
-                onClose={() => {
-                    setShowAddCategory(false);
-                    setEditingCategory(null);
-                }}
-                initialType={activeTab}
-                initialCategory={editingCategory}
+        <div className="fixed inset-0 z-[140] flex items-end sm:items-center justify-center">
+            {/* Backdrop */}
+            <div
+                className="absolute inset-0 bg-navy-950/50 backdrop-blur-sm animate-fade-in"
+                onClick={onClose}
             />
+
+            {/* Modal Content */}
+            <div className="relative w-full max-w-lg bg-white sm:rounded-3xl rounded-t-3xl flex flex-col h-[90vh] sm:max-h-[85vh] overflow-hidden animate-slide-up">
+                {/* Header */}
+                <div className="flex items-center justify-between px-5 pt-5 pb-3">
+                    <button
+                        onClick={onClose}
+                        className="p-2 -ml-2 rounded-xl hover:bg-navy-50 text-navy-800 transition-colors"
+                    >
+                        <ArrowLeft className="w-6 h-6" />
+                    </button>
+                    <h2 className="text-lg font-medium text-navy-800">Category settings</h2>
+                    <button className="p-2 -mr-2 rounded-xl hover:bg-navy-50 text-navy-800 transition-colors">
+                        <Settings2 className="w-6 h-6" />
+                    </button>
+                </div>
+
+                {/* Tabs */}
+                <div className="px-5 mb-4">
+                    <div className="flex bg-navy-50/80 rounded-xl p-1">
+                        {(["expense", "income"] as const).map((tab) => (
+                            <button
+                                key={tab}
+                                onClick={() => setActiveTab(tab)}
+                                className={cn(
+                                    "flex-1 py-2.5 text-sm font-medium rounded-lg transition-all capitalize",
+                                    activeTab === tab
+                                        ? "bg-navy-900 text-amber-400 shadow-sm"
+                                        : "text-navy-600 hover:text-navy-900"
+                                )}
+                            >
+                                {tab}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Category List */}
+                <div className="flex-1 overflow-y-auto pb-32">
+                    <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleDragEnd}
+                    >
+                        <div className="divide-y divide-navy-50">
+                            <SortableContext
+                                items={categories.map((c) => c.id)}
+                                strategy={verticalListSortingStrategy}
+                            >
+                                {categories.map((cat) => (
+                                    <SortableCategoryItem
+                                        key={cat.id}
+                                        cat={cat}
+                                        onDelete={handleDelete}
+                                        onEdit={handleEdit}
+                                    />
+                                ))}
+                            </SortableContext>
+                        </div>
+                    </DndContext>
+                </div>
+
+                <div className="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-white via-white to-transparent pt-10 pointer-events-none">
+                    <button
+                        onClick={() => {
+                            setEditingCategory(null);
+                            setShowAddCategory(true);
+                        }}
+                        className="w-full py-4 rounded-xl bg-amber-400 hover:bg-amber-500 text-navy-900 font-semibold text-base shadow-lg shadow-amber-400/20 transition-all flex items-center justify-center gap-2 active:scale-[0.98] pointer-events-auto"
+                    >
+                        <Plus className="w-5 h-5" />
+                        Add category
+                    </button>
+                </div>
+
+                <AddCategoryModal
+                    open={showAddCategory}
+                    onClose={() => {
+                        setShowAddCategory(false);
+                        setEditingCategory(null);
+                    }}
+                    initialType={activeTab}
+                    initialCategory={editingCategory}
+                />
+            </div>
         </div>
     );
 }

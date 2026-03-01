@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { X, ArrowRightLeft, ChevronDown, Check, Plus } from "lucide-react";
+import { X, ArrowRightLeft, ChevronDown, Settings2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   ICON_MAP,
@@ -10,6 +10,7 @@ import {
   type TransactionType,
 } from "@/lib/constants";
 import { useFinanceStore } from "@/store/finance-store";
+import CategorySettingsModal from "./category-settings-modal";
 
 interface AddTransactionModalProps {
   open: boolean;
@@ -37,18 +38,12 @@ export default function AddTransactionModal({
   );
   const [showAccounts, setShowAccounts] = useState(false);
   const [showToAccounts, setShowToAccounts] = useState(false);
-  const [showQuickAddCategory, setShowQuickAddCategory] = useState(false);
-  const [quickCategoryName, setQuickCategoryName] = useState("");
-  const [quickCategoryIcon, setQuickCategoryIcon] = useState("ShoppingCart");
-  const [quickCategoryColor, setQuickCategoryColor] = useState(
-    COLOR_SWATCHES[0]
-  );
+  const [showCategorySettings, setShowCategorySettings] = useState(false);
 
   const expenseCategories = useFinanceStore((s) => s.expenseCategories);
   const incomeCategories = useFinanceStore((s) => s.incomeCategories);
   const accounts = useFinanceStore((s) => s.accounts);
   const addTransaction = useFinanceStore((s) => s.addTransaction);
-  const addCategory = useFinanceStore((s) => s.addCategory);
 
   const categories =
     activeTab === "expense"
@@ -113,35 +108,6 @@ export default function AddTransactionModal({
     onClose,
   ]);
 
-  const resetQuickAdd = useCallback(() => {
-    setQuickCategoryName("");
-    setQuickCategoryIcon("ShoppingCart");
-    setQuickCategoryColor(COLOR_SWATCHES[0]);
-  }, []);
-
-  const handleQuickAddCategory = useCallback(() => {
-    if (activeTab === "transfer") return;
-    if (!quickCategoryName.trim()) return;
-
-    const newCategory = addCategory({
-      name: quickCategoryName.trim(),
-      icon: quickCategoryIcon,
-      color: quickCategoryColor,
-      type: activeTab,
-    });
-
-    setSelectedCategory(newCategory.id);
-    setShowQuickAddCategory(false);
-    resetQuickAdd();
-  }, [
-    activeTab,
-    quickCategoryName,
-    quickCategoryIcon,
-    quickCategoryColor,
-    addCategory,
-    resetQuickAdd,
-  ]);
-
   const selectedAccountObj = accounts.find((a) => a.id === selectedAccount);
   const toAccountObj = accounts.find((a) => a.id === toAccount);
 
@@ -180,8 +146,8 @@ export default function AddTransactionModal({
                   ? tab.key === "expense"
                     ? "bg-rose-500 text-white shadow-sm"
                     : tab.key === "income"
-                    ? "bg-emerald-500 text-white shadow-sm"
-                    : "bg-blue-500 text-white shadow-sm"
+                      ? "bg-emerald-500 text-white shadow-sm"
+                      : "bg-blue-500 text-white shadow-sm"
                   : "text-navy-400 hover:text-navy-600"
               )}
             >
@@ -410,9 +376,9 @@ export default function AddTransactionModal({
                         style={
                           isSelected
                             ? {
-                                borderColor: cat.color,
-                                backgroundColor: `${cat.color}10`,
-                              }
+                              borderColor: cat.color,
+                              backgroundColor: `${cat.color}10`,
+                            }
                             : undefined
                         }
                       >
@@ -434,14 +400,14 @@ export default function AddTransactionModal({
                     );
                   })}
                   <button
-                    onClick={() => setShowQuickAddCategory(true)}
+                    onClick={() => setShowCategorySettings(true)}
                     className="flex flex-col items-center gap-1.5 p-3 rounded-2xl border-2 border-dashed border-navy-200 hover:border-emerald-300 hover:bg-emerald-50/40 transition-all"
                   >
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-navy-50">
-                      <Plus className="w-5 h-5 text-navy-400" />
+                      <Settings2 className="w-5 h-5 text-navy-400" />
                     </div>
                     <span className="text-[10px] font-medium text-navy-500 text-center leading-tight line-clamp-2">
-                      Add New
+                      Settings
                     </span>
                   </button>
                 </div>
@@ -489,170 +455,24 @@ export default function AddTransactionModal({
               activeTab === "expense"
                 ? "bg-gradient-to-r from-rose-500 to-pink-600 shadow-lg shadow-rose-500/25"
                 : activeTab === "income"
-                ? "bg-gradient-to-r from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/25"
-                : "bg-gradient-to-r from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/25"
+                  ? "bg-gradient-to-r from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/25"
+                  : "bg-gradient-to-r from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/25"
             )}
           >
             {activeTab === "expense"
               ? "Add Expense"
               : activeTab === "income"
-              ? "Add Income"
-              : "Transfer"}
+                ? "Add Income"
+                : "Transfer"}
           </button>
         </div>
       </div>
 
-      {showQuickAddCategory && activeTab !== "transfer" && (
-        <div className="fixed inset-0 z-[120] flex items-end sm:items-center justify-center">
-          <div
-            className="absolute inset-0 bg-navy-950/50 backdrop-blur-sm"
-            onClick={() => {
-              setShowQuickAddCategory(false);
-              resetQuickAdd();
-            }}
-          />
-
-          <div className="relative w-full max-w-md bg-white rounded-t-3xl sm:rounded-3xl max-h-[88vh] overflow-hidden animate-slide-up">
-            <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-navy-50">
-              <div>
-                <h3 className="text-base font-bold text-navy-800">New Category</h3>
-                <p className="text-[11px] text-navy-400 font-medium">
-                  {activeTab === "expense" ? "Expense" : "Income"} category
-                </p>
-              </div>
-              <button
-                onClick={() => {
-                  setShowQuickAddCategory(false);
-                  resetQuickAdd();
-                }}
-                className="p-2 rounded-xl hover:bg-navy-50 text-navy-400 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="overflow-y-auto max-h-[calc(88vh-140px)] px-5 py-4 space-y-4">
-              <div className="flex justify-center">
-                <div className="flex flex-col items-center gap-2">
-                  <div
-                    className="w-14 h-14 rounded-2xl flex items-center justify-center"
-                    style={{ backgroundColor: `${quickCategoryColor}15` }}
-                  >
-                    {ICON_MAP[quickCategoryIcon] && (() => {
-                      const Icon = ICON_MAP[quickCategoryIcon];
-                      return (
-                        <Icon
-                          className="w-7 h-7"
-                          style={{ color: quickCategoryColor }}
-                        />
-                      );
-                    })()}
-                  </div>
-                  <p className="text-xs font-semibold text-navy-700">
-                    {quickCategoryName || "Category Name"}
-                  </p>
-                </div>
-              </div>
-
-              <div>
-                <label className="text-[11px] font-semibold text-navy-400 uppercase tracking-wider mb-1 block">
-                  Category Name
-                </label>
-                <input
-                  type="text"
-                  value={quickCategoryName}
-                  onChange={(e) => setQuickCategoryName(e.target.value)}
-                  placeholder="e.g., Tuition Class"
-                  className="w-full bg-navy-50/50 rounded-xl p-3 text-sm text-navy-800 outline-none placeholder-navy-300 focus:ring-2 focus:ring-emerald-500/30"
-                  autoFocus
-                />
-              </div>
-
-              <div>
-                <label className="text-[11px] font-semibold text-navy-400 uppercase tracking-wider mb-2 block">
-                  Color
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {COLOR_SWATCHES.map((color) => (
-                    <button
-                      key={color}
-                      onClick={() => setQuickCategoryColor(color)}
-                      className={cn(
-                        "w-9 h-9 rounded-xl transition-all flex items-center justify-center",
-                        quickCategoryColor === color
-                          ? "ring-2 ring-offset-2 scale-105"
-                          : "hover:scale-105"
-                      )}
-                      style={{
-                        backgroundColor: color,
-                        // @ts-expect-error: Tailwind ring-color custom property
-                        "--tw-ring-color": color,
-                      }}
-                    >
-                      {quickCategoryColor === color && (
-                        <Check className="w-4 h-4 text-white" />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="text-[11px] font-semibold text-navy-400 uppercase tracking-wider mb-2 block">
-                  Icon
-                </label>
-                <div className="space-y-3">
-                  {Object.entries(ICON_GROUPS).map(([group, icons]) => (
-                    <div key={group}>
-                      <p className="text-[11px] font-medium text-navy-300 mb-2">
-                        {group}
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {icons.map((iconName) => {
-                          const Icon = ICON_MAP[iconName];
-                          if (!Icon) return null;
-                          return (
-                            <button
-                              key={iconName}
-                              onClick={() => setQuickCategoryIcon(iconName)}
-                              className={cn(
-                                "w-10 h-10 rounded-xl flex items-center justify-center transition-all border-2",
-                                quickCategoryIcon === iconName
-                                  ? "border-emerald-500 bg-emerald-50"
-                                  : "border-transparent bg-navy-50 hover:bg-navy-100"
-                              )}
-                            >
-                              <Icon
-                                className="w-5 h-5"
-                                style={{
-                                  color:
-                                    quickCategoryIcon === iconName
-                                      ? quickCategoryColor
-                                      : "#64748b",
-                                }}
-                              />
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="px-5 pb-5 pt-2 border-t border-navy-50">
-              <button
-                onClick={handleQuickAddCategory}
-                disabled={!quickCategoryName.trim()}
-                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold text-sm shadow-lg shadow-emerald-500/25 transition-all disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98]"
-              >
-                Save Category
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <CategorySettingsModal
+        open={showCategorySettings}
+        onClose={() => setShowCategorySettings(false)}
+        initialTab={activeTab === "transfer" ? "expense" : activeTab}
+      />
     </div>
   );
 }
